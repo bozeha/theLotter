@@ -1,70 +1,59 @@
-# Getting Started with Create React App
+# Thelotter TODOs Exam
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Getting Started
+1. Install the project dependencies by running `npm install` from the project's directories - root + client.
+3. Run the project by running `npm run dev` from root
 
-## Available Scripts
+You should now have the development version running on your computer and accessible via http://localhost:5000
 
-In the project directory, you can run:
+## Tasks
 
-### `npm start`
+### Part 1 - TODO Item UI and Functionality.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1a. We have a bug whenever an agent tries to see all of the TODO items there is an infinite loop of calling the server (check the network tab), it causes the same items to render, again and again, please fix it.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+1b. there is an error in the console, "Warning: Each child in a list should have a unique "key" prop", fix that.
 
-### `npm test`
+1c. Our TODO Item list is only showing the title and creation time. Make it show the content as well 
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1d. Our TODOs item list is not sorted by the status, our agents would like to be able to sort the items according to active/done status. add a sort option at the top of the screen with the text "order by status:" and a drop-down with 2 possible options "active", "done".
 
-### `npm run build`
+1e. Once an operation manager finished handling a TODO item, he would like to set it as Done. add a button per item to enable the operation manager the ability to update the item status. once the status changes, make sure you re-sort the list.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1f. It's important to handle all TODOs according to the due date, currently, items are not displayed according to it, add a button at the top of the screen 'Sort by date' with asc/desc option.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Part 2 - Performance and Scale
+1a. Every time the page reloads we get back all the items in the DB. this is not good in case there are many items, we would like to support paging and only get back partial results according to items per page (amount) and the page number. please add this functionality.
 
-### `npm run eject`
+2b. going to the DB (fs) in order to get back the data for every request is costly. can you think of a way to reduce the DB roundtrips?
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+2c. some operations managers have an experty in a certain domain, which means they only can handle specific types of TODO. we would like to support a way for them to choose what types of TODO items they would like to see on the page.
+add a filter option in the TODO item list on the client with possible options 
+"Results"
+"Wins" 
+"Withdraw"
+according to the selection generate a server call to get back only this type of item. 
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2d. (in accordance with 1d) Once an operation manager changed the TODO item status, we would like to persist the change in the DB, add the logic to the client and the server to support it. 
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+#### 2e - Bonus Task
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+We got a request from the operation team to be able to find TODO items by a specific "key", for example, they would like to get all items that contain the key "awaiting", add this functionality.
 
-## Learn More
+**After we added this ability to search by keyword, our DB grows exponentially very soon, and how it takes very long to get the response from the server.**
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Let's create a super search mechanism.
+1. Add q query param `?fastSearch=` to the `/todos` API call and implement an *efficient* search solution, that gets a word as an input and returns an array of matching tickets.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+2. Our code is not following the best practices rules, it is not well structured and not reusable. try and make it better. 
 
-### Code Splitting
+3. Sometimes it takes time to load all the relevant TODOs, add Progress bar indication. 
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## General notes
+- code should compile and run without any warnings.
+- basic requirements must be met.
+- consider best practices, edge cases, performance, and scale.
+- the bonus is just a bonus, don't start with it.
+Good luck!
