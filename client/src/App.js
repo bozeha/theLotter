@@ -8,6 +8,8 @@ import MainHeader from "./components/MainHeader";
 import Button from "@material-ui/core/Button";
 import t from "./utils/translations";
 import { direction } from "./utils/enums";
+import Footer from "./components/Footer";
+import getConfig from "./utils/config";
 
 import "./App.css";
 
@@ -32,6 +34,7 @@ function App() {
   const [todos, setTodos] = useState("");
   const [filterByStatus, setFilterByStatus] = useState("");
   const [sortByDate, setSortByDate] = useState("");
+  const [currentPage, setCurrentPage] = useState(null);
   const classes = useStyles();
   const filterByStatusFunction = (todosAfterChange) => {
     if (filterByStatus && todos) {
@@ -74,10 +77,19 @@ function App() {
     }
   };
 
-  useEffect(() => {
+  const updatePage = async () => {
     callApi().then((data) => {
       setTodos(data);
     });
+  };
+
+  useEffect(() => {
+    if (currentPage) {
+      updatePage();
+    }
+  }, [currentPage]);
+  useEffect(() => {
+    setCurrentPage(1);
   }, []);
 
   useEffect(() => {
@@ -105,10 +117,18 @@ function App() {
     }
   };
   const callApi = async () => {
-    const response = await fetch("/api/todos");
-    const body = await response.json();
-    if (response.status !== 200) throw Error(body.message);
-    return body;
+    const numberPerPage = getConfig("numberInPage");
+    try {
+      const response = await fetch(
+        `/api/todos?numberPerPage=${numberPerPage}&pageNumber=${currentPage}`
+      );
+      const body = await response.json();
+      if (response.status !== 200) throw Error(body.message);
+      return body;
+    } catch (error) {
+      console.log(`Error:::${error}`);
+      return null;
+    }
   };
 
   return (
@@ -169,6 +189,7 @@ function App() {
             </Grid>
           ))}
       </Grid>
+      <Footer currentPage={currentPage} setCurrentPage={setCurrentPage} />
     </div>
   );
 }
