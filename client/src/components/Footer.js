@@ -7,7 +7,6 @@ const Footer = ({ currentPage, setCurrentPage }) => {
   const [page, setPage] = useState(1);
   return (
     <div>
-      {getConfig("numberInPage")}
       <PaginationControl
         page={currentPage}
         between={4}

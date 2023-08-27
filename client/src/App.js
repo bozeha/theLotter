@@ -6,6 +6,8 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import MainHeader from "./components/MainHeader";
 import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
+
 import t from "./utils/translations";
 import { direction } from "./utils/enums";
 import Footer from "./components/Footer";
@@ -35,6 +37,10 @@ function App() {
   const [filterByStatus, setFilterByStatus] = useState("");
   const [sortByDate, setSortByDate] = useState("");
   const [currentPage, setCurrentPage] = useState(null);
+  const [typeOfResultsFromServer, setTypeOfResultsFromServer] = useState("all");
+  const [loader, setLoader] = useState(false);
+  const [autoComplite, setAutoComplite] = useState("");
+
   const classes = useStyles();
   const filterByStatusFunction = (todosAfterChange) => {
     if (filterByStatus && todos) {
@@ -57,6 +63,26 @@ function App() {
     }
   };
 
+  const updateElementInServer = async (id, status) => {
+    try {
+      setLoader(true);
+      const data = {
+        id: id,
+        status: status,
+      };
+      fetch("/api/todos/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // Add this header
+        },
+        body: JSON.stringify(data),
+      });
+      setLoader(false);
+    } catch (error) {
+      setLoader(false);
+      console.log(`Error:::${error}`);
+    }
+  };
   const sortByDateFunction = () => {
     if (sortByDate && todos) {
       let sortToDos = [...todos];
@@ -84,10 +110,14 @@ function App() {
   };
 
   useEffect(() => {
+    fastSearch();
+  }, [autoComplite]);
+
+  useEffect(() => {
     if (currentPage) {
       updatePage();
     }
-  }, [currentPage]);
+  }, [currentPage, typeOfResultsFromServer]);
   useEffect(() => {
     setCurrentPage(1);
   }, []);
@@ -103,9 +133,11 @@ function App() {
 
   const changeStatus = (id) => {
     const currentTodos = [...todos];
+    let newStatus = "";
     currentTodos.map((current) => {
       if (current.id === id) {
         current.status = current.status === "Done" ? "Active" : "Done";
+        newStatus = current.status;
       }
     });
 
@@ -115,29 +147,65 @@ function App() {
     } else {
       setTodos(currentTodos);
     }
+
+    /// Update server
+    updateElementInServer(id, newStatus);
   };
   const callApi = async () => {
+    setLoader(true);
     const numberPerPage = getConfig("numberInPage");
     try {
       const response = await fetch(
-        `/api/todos?numberPerPage=${numberPerPage}&pageNumber=${currentPage}`
+        `/api/todos?numberPerPage=${numberPerPage}&pageNumber=${currentPage}&typeOfResults=${typeOfResultsFromServer}`
       );
       const body = await response.json();
       if (response.status !== 200) throw Error(body.message);
+      setLoader(false);
       return body;
     } catch (error) {
       console.log(`Error:::${error}`);
+      setLoader(false);
+      return null;
+    }
+  };
+  const fastSearch = async () => {
+    setLoader(true);
+
+    try {
+      const response = await fetch(`/api/todos?fastSearch=${autoComplite}`);
+      console.log(`aaaaaaaaaaa`);
+      let body = {};
+      if (response) {
+        console.log(`ppp`);
+        body = await response?.json();
+      }
+      setTodos(body);
+      if (response.status !== 200) throw Error(body.message);
+      setLoader(false);
+      return body;
+    } catch (error) {
+      console.log(`Error:::${error}`);
+      setLoader(false);
       return null;
     }
   };
 
   return (
     <div className={classes.root}>
+      {loader && (
+        <div className="loader">
+          <CircularProgress />
+        </div>
+      )}
       <MainHeader
         filterByStatus={filterByStatus}
         setFilterByStatus={setFilterByStatus}
         sortByDate={sortByDate}
         setSortByDate={setSortByDate}
+        typeOfResultsFromServer={typeOfResultsFromServer}
+        setTypeOfResultsFromServer={setTypeOfResultsFromServer}
+        autoComplite={autoComplite}
+        setAutoComplite={setAutoComplite}
       />
       <Grid container spacing={10}>
         {todos &&

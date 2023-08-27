@@ -7,3 +7,6 @@
 .desc::after{
     content: '\25BC'
 }
+#server-filter .MuiFormGroup-root{
+    flex-direction:row;
+}

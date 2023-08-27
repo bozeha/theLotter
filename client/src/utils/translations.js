@@ -6,6 +6,8 @@ const transObj = {
   changeToActive: "Change to active",
   changeToDone: "Change to done",
   ascDesc: "Asc/Desc",
+  getFromServer: "Get from server",
+  bonusQuesitionFastSearch: "Bonus question fast search",
 };
 
 const t = (text) => {
